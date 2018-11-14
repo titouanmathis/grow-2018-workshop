@@ -50,8 +50,17 @@ const sketch = ({ render, width, height }) => {
     };
   };
 
-  const drawTriangle = (ctx, a, b, c = { position: [0.5, 0.5] }) => {
+  const drawTriangle = (time, ctx, a, b, c = { position: [0.5, 0.5] }) => {
     ctx.beginPath();
+
+    const uA = mapRange(pointer.x, 0, innerWidth, 0, 1, true);
+    const vA = mapRange(pointer.y, 0, innerHeight, 0, 1, true);
+    a.position = dampArray(a.position, [uA, vA], 0.0005, time);
+
+    // const uB = mapRange(pointer.x, 0, innerWidth, 0.4, 0.6, true);
+    // const vB = mapRange(pointer.y, 0, innerHeight, 0.4, 0.6, true);
+    // pointB.position = dampArray(pointB.position, [uB, vB], 0.0005, time);
+
     [a, b, c].forEach(({ position }, index) => {
       let { x, y } = getPositionFromUv(position);
       const method = index === 0 ? 'moveTo' : 'lineTo';
@@ -74,21 +83,13 @@ const sketch = ({ render, width, height }) => {
     context.fillStyle = '#000';
     context.fillRect(0, 0, width, height);
 
-    const uA = mapRange(pointer.x, 0, innerWidth, 0, 1, true);
-    const vA = mapRange(pointer.y, 0, innerHeight, 0, 1, true);
-    pointA.position = dampArray(pointA.position, [uA, vA], 0.0005, time);
-
-    const uB = mapRange(pointer.x, 0, innerWidth, 0.4, 0.6, true);
-    const vB = mapRange(pointer.y, 0, innerHeight, 0.4, 0.6, true);
-    pointB.position = dampArray(pointB.position, [uB, vB], 0.0005, time);
-
     grid.forEach(point => {
       // const [u, v] = position;
       // const x = lerp(margin, width - margin, u);
       // const y = lerp(margin, height - margin, v);
 
       // context.globalCompositeOperation = 'xor';
-      drawTriangle(context, point, pointA, pointB);
+      drawTriangle(time, context, point, pointA, pointB);
 
       // context.beginPath();
       // context.arc(x, y, 5, 0, Math.PI * 2);
