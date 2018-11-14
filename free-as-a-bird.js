@@ -2,10 +2,14 @@ import canvasSketch from 'canvas-sketch';
 import random from 'canvas-sketch-util/random';
 import { lerp, mapRange, dampArray } from 'canvas-sketch-util/math';
 
+const dimensions = [
+  window.innerWidth * window.devicePixelRatio,
+  window.innerHeight * window.devicePixelRatio,
+];
 const settings = {
   animate: true,
   scaleToView: true,
-  dimensions: [2048, 2048],
+  dimensions,
 };
 
 const pointer = {
@@ -28,6 +32,10 @@ const sketch = ({ render, width, height }) => {
       for (let y = 0; y < count; y++) {
         let u = count <= 1 ? 0.5 : x / (count - 1);
         let v = count <= 1 ? 0.5 : y / (count - 1);
+
+        const offset = random.insideCircle(0.0001 * width);
+        u += offset[0];
+        v += offset[1];
 
         points.push({
           position: [u, v],
@@ -52,15 +60,6 @@ const sketch = ({ render, width, height }) => {
 
   const drawTriangle = (time, ctx, a, b, c = { position: [0.5, 0.5] }) => {
     ctx.beginPath();
-
-    const uA = mapRange(pointer.x, 0, innerWidth, 0, 1, true);
-    const vA = mapRange(pointer.y, 0, innerHeight, 0, 1, true);
-    a.position = dampArray(a.position, [uA, vA], 0.0005, time);
-
-    // const uB = mapRange(pointer.x, 0, innerWidth, 0.4, 0.6, true);
-    // const vB = mapRange(pointer.y, 0, innerHeight, 0.4, 0.6, true);
-    // pointB.position = dampArray(pointB.position, [uB, vB], 0.0005, time);
-
     [a, b, c].forEach(({ position }, index) => {
       let { x, y } = getPositionFromUv(position);
       const method = index === 0 ? 'moveTo' : 'lineTo';
@@ -69,9 +68,9 @@ const sketch = ({ render, width, height }) => {
     });
 
     ctx.closePath();
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.125;
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 0.5;
     ctx.stroke();
     // ctx.fillStyle = 'red';
     // ctx.fill();
@@ -79,9 +78,17 @@ const sketch = ({ render, width, height }) => {
 
   return ({ context, width, height, time }) => {
     context.globalCompositeOperation = 'source-over';
-    context.globalAlpha = 0.1;
+    context.globalAlpha = 0.2;
     context.fillStyle = '#000';
     context.fillRect(0, 0, width, height);
+
+    const uA = mapRange(pointer.x, 0, innerWidth, 0, 1, true);
+    const vA = mapRange(pointer.y, 0, innerHeight, 0, 1, true);
+    pointA.position = dampArray(pointA.position, [uA, vA], 0.008, time);
+
+    const uB = mapRange(pointer.x, 0, innerWidth, 0.4, 0.6, true);
+    const vB = mapRange(pointer.y, 0, innerHeight, 0.4, 0.6, true);
+    pointB.position = dampArray(pointB.position, [uB, vB], 0.008, time);
 
     grid.forEach(point => {
       // const [u, v] = position;
@@ -107,3 +114,5 @@ const sketch = ({ render, width, height }) => {
 };
 
 canvasSketch(sketch, settings);
+
+document.body.style.background = '#000';
