@@ -6,7 +6,7 @@ import { lerp } from 'canvas-sketch-util/math';
 /**
  * Set the random's method seed
  */
-random.setSeed(random.getRandomSeed());
+random.setSeed(String(155718) || random.getRandomSeed());
 
 /**
  * Canvas sketch settings
@@ -16,7 +16,7 @@ random.setSeed(random.getRandomSeed());
 const settings = {
   suffix: random.getSeed(),
   animate: true,
-  dimensions: [512, 512],
+  dimensions: [2048, 2048],
 };
 
 const sketch = () => {
@@ -36,7 +36,7 @@ const sketch = () => {
         const v = count <= 1 ? 0.5 : y / (count - 1);
         points.push({
           position: [u, v],
-          radius: Math.max(0, random.gaussian(5, 12)),
+          radius: Math.max(0, random.gaussian(40, 60)),
           color: random.pick(palette),
         });
       }
