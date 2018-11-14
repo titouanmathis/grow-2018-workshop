@@ -1,13 +1,63 @@
-const canvasSketch = require('canvas-sketch');
+import canvasSketch from 'canvas-sketch';
+import random from 'canvas-sketch-util/random';
+import colors from 'nice-color-palettes';
+import { lerp } from 'canvas-sketch-util/math';
 
+/**
+ * Set the random's method seed
+ */
+random.setSeed(random.getRandomSeed());
+
+/**
+ * Canvas sketch settings
+ * @see https://github.com/mattdesl/canvas-sketch/blob/master/docs/api.md#settings
+ * @type {Object}
+ */
 const settings = {
-  dimensions: [ 2048, 2048 ]
+  suffix: random.getSeed(),
+  animate: true,
+  dimensions: [512, 512],
 };
 
 const sketch = () => {
-  return ({ context, width, height }) => {
-    context.fillStyle = 'white';
+  /**
+   * Create a grid of points
+   * @param  {Number} count The number of columns and rows
+   * @return {Array}        A list of points
+   */
+  const createGrid = (count = 20) => {
+    const points = [];
+
+    for (let x = 0; x < count; x++) {
+      for (let y = 0; y < count; y++) {
+        const u = count <= 1 ? 0.5 : x / (count - 1);
+        const v = count <= 1 ? 0.5 : y / (count - 1);
+        points.push([u, v]);
+      }
+    }
+
+    return points;
+  };
+
+  const grid = createGrid().filter(() => random.chance(0.5));
+
+  return ({ context, width, height, time }) => {
+    context.fillStyle = '#000';
     context.fillRect(0, 0, width, height);
+
+    const wave = Math.sin(time);
+    const radius = 5;
+    const margin = 0.15 * width;
+
+    grid.forEach(([u, v], index) => {
+      const x = lerp(margin, width - margin, u);
+      const y = lerp(margin, height - margin, v);
+
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.fillStyle = '#fff';
+      context.fill();
+    });
   };
 };
 
