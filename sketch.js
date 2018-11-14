@@ -1,6 +1,6 @@
 import canvasSketch from 'canvas-sketch';
 import random from 'canvas-sketch-util/random';
-import colors from 'nice-color-palettes';
+import palettes from 'nice-color-palettes';
 import { lerp } from 'canvas-sketch-util/math';
 
 /**
@@ -20,6 +20,8 @@ const settings = {
 };
 
 const sketch = () => {
+  const palette = random.pick(palettes);
+  const background = palette.shift();
   /**
    * Create a grid of points
    * @param  {Number} count The number of columns and rows
@@ -32,7 +34,10 @@ const sketch = () => {
       for (let y = 0; y < count; y++) {
         const u = count <= 1 ? 0.5 : x / (count - 1);
         const v = count <= 1 ? 0.5 : y / (count - 1);
-        points.push([u, v]);
+        points.push({
+          position: [u, v],
+          color: random.pick(palette),
+        });
       }
     }
 
@@ -42,20 +47,21 @@ const sketch = () => {
   const grid = createGrid().filter(() => random.chance(0.5));
 
   return ({ context, width, height, time }) => {
-    context.fillStyle = '#000';
+    context.fillStyle = background;
     context.fillRect(0, 0, width, height);
 
     const wave = Math.sin(time);
     const radius = 5;
     const margin = 0.15 * width;
 
-    grid.forEach(([u, v], index) => {
+    grid.forEach(({ position, color }, index) => {
+      const [u, v] = position;
       const x = lerp(margin, width - margin, u);
       const y = lerp(margin, height - margin, v);
 
       context.beginPath();
       context.arc(x, y, radius, 0, Math.PI * 2);
-      context.fillStyle = '#fff';
+      context.fillStyle = color;
       context.fill();
     });
   };
