@@ -6,7 +6,7 @@ import { lerp } from 'canvas-sketch-util/math';
 /**
  * Set the random's method seed
  */
-random.setSeed(String(155718) || random.getRandomSeed());
+random.setSeed('995239' || random.getRandomSeed());
 
 /**
  * Canvas sketch settings
@@ -21,6 +21,7 @@ const settings = {
 
 const sketch = () => {
   const palette = random.pick(palettes);
+  const texts = ['|', '–', '•'];
   const background = palette.shift();
   /**
    * Create a grid of points
@@ -36,8 +37,9 @@ const sketch = () => {
         const v = count <= 1 ? 0.5 : y / (count - 1);
         points.push({
           position: [u, v],
-          radius: Math.max(0, random.gaussian(40, 60)),
+          radius: Math.max(0, random.gaussian(120, 100)),
           color: random.pick(palette),
+          text: random.pick(texts),
         });
       }
     }
@@ -54,17 +56,29 @@ const sketch = () => {
     const wave = Math.sin(time);
     const margin = 0.15 * width;
 
-    grid.forEach(({ position, color, radius }, index) => {
+    grid.forEach(({ position, color, radius, text }, index) => {
       const [u, v] = position;
       const x = lerp(margin, width - margin, u);
       const y = lerp(margin, height - margin, v);
 
-      context.beginPath();
-      context.arc(x, y, radius, 0, Math.PI * 2);
+      // context.beginPath();
+      // context.arc(x, y, radius, 0, Math.PI * 2);
+      // context.fillStyle = color;
+      // context.fill();
+
       context.fillStyle = color;
-      context.fill();
+      context.font = `${radius}px monospace`;
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(text, x, y);
     });
   };
 };
 
 canvasSketch(sketch, settings);
+
+document.addEventListener('keydown', ({ which }) => {
+  if (which === 32) {
+    location.reload();
+  }
+});
