@@ -36,6 +36,7 @@ const sketch = () => {
         const v = count <= 1 ? 0.5 : y / (count - 1);
         points.push({
           position: [u, v],
+          radius: random.range(1, 20),
           color: random.pick(palette),
         });
       }
@@ -51,10 +52,9 @@ const sketch = () => {
     context.fillRect(0, 0, width, height);
 
     const wave = Math.sin(time);
-    const radius = 5;
     const margin = 0.15 * width;
 
-    grid.forEach(({ position, color }, index) => {
+    grid.forEach(({ position, color, radius }, index) => {
       const [u, v] = position;
       const x = lerp(margin, width - margin, u);
       const y = lerp(margin, height - margin, v);
