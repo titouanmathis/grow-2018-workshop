@@ -6,7 +6,7 @@ import { lerp } from 'canvas-sketch-util/math';
 /**
  * Set the random's method seed
  */
-random.setSeed('995239' || random.getRandomSeed());
+random.setSeed(random.getRandomSeed());
 
 /**
  * Canvas sketch settings
@@ -15,29 +15,38 @@ random.setSeed('995239' || random.getRandomSeed());
  */
 const settings = {
   suffix: random.getSeed(),
-  animate: true,
-  dimensions: [2048, 2048],
+  // animate: true,
+  dimensions: 'A4',
+  pixelsPerInch: 300,
+  units: 'cm',
 };
 
-const sketch = () => {
+const sketch = ({ width, height }) => {
   const palette = random.pick(palettes);
-  const texts = ['|', '–', '•'];
-  const background = palette.shift();
+  const background = 'hsl(0, 0%, 98%)';
+  const aspect = width / height;
+  const texts = ['|', '—', '•'];
+
   /**
    * Create a grid of points
    * @param  {Number} count The number of columns and rows
    * @return {Array}        A list of points
    */
-  const createGrid = (count = 20) => {
+  const createGrid = (count = 40) => {
     const points = [];
+    const frequency = 0.51;
 
     for (let x = 0; x < count; x++) {
       for (let y = 0; y < count; y++) {
         const u = count <= 1 ? 0.5 : x / (count - 1);
         const v = count <= 1 ? 0.5 : y / (count - 1);
+
+        const noise = random.noise2D(u * aspect * frequency, v * frequency);
+
         points.push({
           position: [u, v],
-          radius: Math.max(0, random.gaussian(120, 100)),
+          radius: Math.abs(20 + noise * 40) * width * 0.005,
+          rotation: noise * Math.PI * 0.5,
           color: random.pick(palette),
           text: random.pick(texts),
         });
@@ -53,10 +62,9 @@ const sketch = () => {
     context.fillStyle = background;
     context.fillRect(0, 0, width, height);
 
-    const wave = Math.sin(time);
-    const margin = 0.15 * width;
+    const margin = 0.2 * width;
 
-    grid.forEach(({ position, color, radius, text }, index) => {
+    grid.forEach(({ rotation, position, color, radius, text }) => {
       const [u, v] = position;
       const x = lerp(margin, width - margin, u);
       const y = lerp(margin, height - margin, v);
@@ -66,11 +74,16 @@ const sketch = () => {
       // context.fillStyle = color;
       // context.fill();
 
+      context.save();
       context.fillStyle = color;
-      context.font = `${radius}px monospace`;
+      context.font = `bold ${radius}px Arial`;
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.fillText(text, x, y);
+
+      context.translate(x, y);
+      context.rotate(rotation);
+      context.fillText(text, 0, 0);
+      context.restore();
     });
   };
 };
