@@ -1,6 +1,7 @@
 import canvasSketch from 'canvas-sketch';
 import random from 'canvas-sketch-util/random';
 import palettes from 'nice-color-palettes';
+import { expoInOut } from 'eases';
 
 /**
  * Set the random's method seed
@@ -65,20 +66,30 @@ const sketch = ({ context }) => {
   const meshes = [];
 
   for (let i = 0; i < 50; i++) {
-    const color = random.pick(palette);
-    const material = new THREE.MeshBasicMaterial({ color });
+    const material = new THREE.MeshStandardMaterial({
+      color: random.pick(palette),
+      metalness: 0,
+      roughness: 1,
+    });
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
     mesh.position
-      .set(random.range(-1, 1), random.range(-1, 1), random.range(-1, 1))
-      .multiplyScalar(1.5);
+      .set(random.range(-1, 1), random.range(-10, 10), random.range(-1, 1))
+      .multiplyScalar(1);
     mesh.scale.set(
-      random.range(0.1, 1) * random.gaussian(),
-      random.range(0.1, 1) * random.gaussian(),
-      random.range(0.1, 1) * random.gaussian()
+      random.range(0.1, 0.5),
+      random.range(0.1, 10),
+      random.range(0.1, 0.5)
     );
     meshes.push(mesh);
   }
+
+  const light = new THREE.DirectionalLight('#fff', 1);
+  const light2 = new THREE.DirectionalLight('#fff', 0.5);
+  light.position.set(5, 5, 5);
+  light2.position.set(-5, -5, -5);
+  scene.add(light);
+  scene.add(light2);
 
   // draw each frame
   return {
@@ -110,13 +121,21 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render({ time }) {
-      meshes.forEach(mesh => {
-        mesh.scale.z = Math.sin(time) * 0.5 + 1;
-        mesh.scale.x = Math.sin(time * 0.25);
+      const eased = expoInOut(time);
+      meshes.forEach((mesh, index) => {
+        // mesh.rotation.y = Math.sin(eased + mesh.position.y);
+        mesh.position.y += 0.0005 * index;
+
+        if (mesh.position.y > 10) {
+          mesh.position.y = -10;
+        }
+
+        mesh.scale.y = Math.cos(eased * index) * 0.5 + 1;
+        mesh.scale.x = Math.sin((eased * index) / 2) * 0.5 + 0.5;
       });
-      scene.rotation.z = Math.sin(time);
-      scene.rotation.x = Math.sin(time * 0.5);
-      controls.update();
+      // scene.rotation.z = Math.sin(time) * 10;
+      scene.rotation.y = time;
+      // controls.update();
       renderer.render(scene, camera);
     },
     // Dispose of events & renderer for cleaner hot-reloading
