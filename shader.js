@@ -8,18 +8,14 @@ const settings = {
   animate: true,
 };
 
+const pointer = [];
+document.addEventListener('mousemove', ({ clientX, clientY }) => {
+  pointer[0] = clientX / window.innerWidth;
+  pointer[1] = clientY / window.innerHeight;
+});
+
 // Your glsl code
-const frag = glsl(`
-  precision highp float;
-
-  uniform float time;
-  varying vec2 vUv;
-
-  void main () {
-    vec3 color = 0.5 + 0.5 * cos(time + vUv.xyx + vec3(0.0, 2.0, 4.0));
-    gl_FragColor = vec4(color, 1.0);
-  }
-`);
+const frag = require('./shader.frag');
 
 // Your sketch, which simply returns the shader
 const sketch = ({ gl }) => {
@@ -33,6 +29,8 @@ const sketch = ({ gl }) => {
     uniforms: {
       // Expose props from canvas-sketch
       time: ({ time }) => time,
+      pointer: () => pointer,
+      aspect: ({ width, height }) => width / height,
     },
   });
 };
