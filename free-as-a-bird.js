@@ -68,35 +68,42 @@ const sketch = ({ render, width, height }) => {
     });
 
     ctx.closePath();
-    ctx.globalAlpha = 0.125;
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-    // ctx.fillStyle = 'red';
-    // ctx.fill();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    // ctx.stroke();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = 'white';
+    ctx.fill();
   };
 
   return ({ context, width, height, time }) => {
     context.globalCompositeOperation = 'source-over';
-    context.globalAlpha = 0.2;
+    context.globalAlpha = 1;
     context.fillStyle = '#000';
     context.fillRect(0, 0, width, height);
 
-    const uA = mapRange(pointer.x, 0, innerWidth, 0, 1, true);
-    const vA = mapRange(pointer.y, 0, innerHeight, 0, 1, true);
-    pointA.position = dampArray(pointA.position, [uA, vA], 0.008, time);
+    if (pointer.x > 0 && pointer.y > 0) {
+      const uA = mapRange(pointer.x, 0, innerWidth, 0, 1, true);
+      const vA = mapRange(pointer.y, 0, innerHeight, 0, 1, true);
+      pointA.position = dampArray(pointA.position, [uA, vA], 0.008, time);
 
-    const uB = mapRange(pointer.x, 0, innerWidth, 0.4, 0.6, true);
-    const vB = mapRange(pointer.y, 0, innerHeight, 0.4, 0.6, true);
-    pointB.position = dampArray(pointB.position, [uB, vB], 0.008, time);
+      const uB = mapRange(pointer.x, 0, innerWidth, 0.4, 0.6, true);
+      const vB = mapRange(pointer.y, 0, innerHeight, 0.4, 0.6, true);
+      pointB.position = dampArray(pointB.position, [uB, vB], 0.008, time);
+    }
 
-    grid.forEach(point => {
+    grid.forEach((point, index) => {
       // const [u, v] = position;
       // const x = lerp(margin, width - margin, u);
       // const y = lerp(margin, height - margin, v);
 
       // context.globalCompositeOperation = 'xor';
-      drawTriangle(time, context, point, pointA, pointB);
+      const prevPoint = index === 0 ? grid[grid.length - 1] : grid[index - 1];
+      const midPoint = index % 2 ? pointA : pointB;
+      drawTriangle(time, context, point, prevPoint, midPoint);
 
       // context.beginPath();
       // context.arc(x, y, 5, 0, Math.PI * 2);
