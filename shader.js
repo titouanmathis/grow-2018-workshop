@@ -9,7 +9,7 @@ const settings = {
   dimensions: [512, 512],
 };
 
-const pointer = [];
+const pointer = new Float32Array(2);
 document.addEventListener('mousemove', ({ clientX, clientY }) => {
   pointer[0] = clientX / window.innerWidth;
   pointer[1] = clientY / window.innerHeight;

@@ -13,7 +13,7 @@ void main () {
 	d += 0.15 * noise(vec3(vUv * 1.5, time * 0.5));
 	d += 0.5 * noise(vec3(vUv * 0.51, time * 0.5));
 
-	vec2 coord = vUv - pointer;
+	vec2 coord = vUv - 0.5;
 	coord.x *= aspect;
 	float dist = length(coord);
 	float mask = smoothstep(0.25, 0.248, dist);
