@@ -1,5 +1,6 @@
 import canvasSketch from 'canvas-sketch';
 import random from 'canvas-sketch-util/random';
+import palettes from 'nice-color-palettes';
 
 /**
  * Set the random's method seed
@@ -13,6 +14,8 @@ global.THREE = require('three');
 require('three/examples/js/controls/OrbitControls');
 
 const settings = {
+  dimensions: [2048, 2048],
+  scaleToView: true,
   suffix: random.getSeed(),
   // Make the loop animated
   animate: true,
@@ -44,14 +47,13 @@ const sketch = ({ context }) => {
   const renderer = new THREE.WebGLRenderer({
     context,
   });
+  const palette = random.pick(palettes);
 
   // WebGL background color
-  renderer.setClearColor('#fff', 1);
+  renderer.setClearColor(palette.shift(), 1);
 
   // Setup a camera
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(4, 4, 6);
-  camera.lookAt(new THREE.Vector3());
+  const camera = new THREE.OrthographicCamera();
 
   // Setup camera controller
   const controls = new THREE.OrbitControls(camera);
@@ -60,19 +62,22 @@ const sketch = ({ context }) => {
   const scene = new THREE.Scene();
 
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshNormalMaterial();
+  const meshes = [];
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 50; i++) {
+    const color = random.pick(palette);
+    const material = new THREE.MeshBasicMaterial({ color });
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
     mesh.position
       .set(random.range(-1, 1), random.range(-1, 1), random.range(-1, 1))
-      .multiplyScalar(1.2);
+      .multiplyScalar(1.5);
     mesh.scale.set(
       random.range(0.1, 1) * random.gaussian(),
       random.range(0.1, 1) * random.gaussian(),
       random.range(0.1, 1) * random.gaussian()
     );
+    meshes.push(mesh);
   }
 
   // draw each frame
@@ -81,11 +86,36 @@ const sketch = ({ context }) => {
     resize({ pixelRatio, viewportWidth, viewportHeight }) {
       renderer.setPixelRatio(pixelRatio);
       renderer.setSize(viewportWidth, viewportHeight);
-      camera.aspect = viewportWidth / viewportHeight;
+      const aspect = viewportWidth / viewportHeight;
+
+      // Ortho zoom
+      const zoom = 2;
+
+      // Bounds
+      camera.left = -zoom * aspect;
+      camera.right = zoom * aspect;
+      camera.top = zoom;
+      camera.bottom = -zoom;
+
+      // Near/Far
+      camera.near = -100;
+      camera.far = 100;
+
+      // Set position & look at world center
+      camera.position.set(zoom, zoom, zoom);
+      camera.lookAt(new THREE.Vector3());
+
+      // Update the camera
       camera.updateProjectionMatrix();
     },
     // Update & render your scene here
     render({ time }) {
+      meshes.forEach(mesh => {
+        mesh.scale.z = Math.sin(time) * 0.5 + 1;
+        mesh.scale.x = Math.sin(time * 0.25);
+      });
+      scene.rotation.z = Math.sin(time);
+      scene.rotation.x = Math.sin(time * 0.5);
       controls.update();
       renderer.render(scene, camera);
     },
