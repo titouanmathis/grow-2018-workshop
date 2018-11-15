@@ -7,6 +7,11 @@ bezier-easing@^2.1.0:
   resolved "https://registry.yarnpkg.com/bezier-easing/-/bezier-easing-2.1.0.tgz#c04dfe8b926d6ecaca1813d69ff179b7c2025d86"
   integrity sha1-wE3+i5JtbsrKGBPWn/F5t8ICXYY=
 
+browser-media-mime-type@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/browser-media-mime-type/-/browser-media-mime-type-1.0.0.tgz#a1534a8ad938f0bcf4b642f540fa35605653d0e9"
+  integrity sha1-oVNKitk48Lz0tkL1QPo1YFZT0Ok=
+
 buffer-to-arraybuffer@^0.0.5:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/buffer-to-arraybuffer/-/buffer-to-arraybuffer-0.0.5.tgz#6064a40fa76eb43c723aba9ef8f6e1216d10511a"
@@ -156,6 +161,16 @@ lineclip@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/lineclip/-/lineclip-1.1.5.tgz#2bf26067d94354feabf91e42768236db5616fd13"
   integrity sha1-K/JgZ9lDVP6r+R5CdoI221YW/RM=
+
+load-asset@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/load-asset/-/load-asset-1.2.0.tgz#b746ecfde65d80ecc47b21aeb19b50c7422fe1b5"
+  integrity sha512-L/uWQjoCt6LBrgqR/21imi/a8aCLuY0L3dkGDBGOwWFm5/fvApb/O5ewAj0agHTTDhtMHVN8/lvJUI9Ub9IH5Q==
+  dependencies:
+    browser-media-mime-type "^1.0.0"
+    is-promise "^2.1.0"
+    object-assign "^4.1.1"
+    xhr "^2.4.1"
 
 map-limit@0.0.1:
   version "0.0.1"
@@ -338,7 +353,7 @@ xhr-request@^1.0.1:
     url-set-query "^1.0.0"
     xhr "^2.0.4"
 
-xhr@^2.0.4:
+xhr@^2.0.4, xhr@^2.4.1:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/xhr/-/xhr-2.5.0.tgz#bed8d1676d5ca36108667692b74b316c496e49dd"
   integrity sha512-4nlO/14t3BNUZRXIXfXe+3N6w3s1KoxcJUUURctd64BLRe67E4gRwp4PjywtDY72fXpZ1y6Ch0VZQRY/gMPzzQ==
