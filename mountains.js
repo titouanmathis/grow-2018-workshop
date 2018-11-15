@@ -12,6 +12,7 @@ const settings = {
   suffix: random.getSeed(),
   // Make the loop animated
   animate: true,
+  duration: 8,
   // Get a WebGL canvas rather than 2D
   context: 'webgl',
   // Turn on MSAA
@@ -39,7 +40,7 @@ const sketch = ({ context }) => {
     return points;
   };
 
-  const count = 20;
+  const count = 30;
   const grid = createGrid(count);
 
   // Create a renderer
@@ -74,12 +75,15 @@ const sketch = ({ context }) => {
         flatShading: true,
       })
     );
-    mesh.position.x = (u * -grid.length) / 10;
-    mesh.position.z = (v * -grid.length) / 10;
+    mesh.position.x = (u * -grid.length) / 100;
+    mesh.position.z = (v * -grid.length) / 100;
     const noise = random.noise2D(u, v, frequency, amplitude);
     mesh.position.y = noise;
-    mesh.scale.multiplyScalar(0.1);
-    scene.add(mesh);
+    mesh.scale.multiplyScalar(0.05);
+    mesh.__original = mesh.clone();
+    mesh.__original.u = u;
+    mesh.__original.v = v;
+    // scene.add(mesh);
     meshes.push(mesh);
   });
 
@@ -90,20 +94,23 @@ const sketch = ({ context }) => {
 
     points.forEach(([u, v]) => {
       const noise = random.noise2D(u, v, frequency, amplitude);
-      const x = (u * -rows.length * count) / 10;
+      const x = (u * -rows.length * count) / 100;
       const y = noise;
-      const z = (v * -rows.length * count) / 10;
+      const z = (v * -rows.length * count) / 100;
       const vector = new THREE.Vector3(x, y, z);
+      vector.__original = new THREE.Vector3(x, y, z);
       geometry.vertices.push(vector);
     });
 
     const line = new THREE.Line(geometry, material);
+    line.needsUpdate = true;
     scene.add(line);
     lines.push(line);
   });
 
   // Specify an ambient/unlit colour
   scene.add(new THREE.AmbientLight('#fff'));
+  scene.position.y = -5;
 
   // Add some light
   const light = new THREE.PointLight('#fff', 1, 150.5);
@@ -139,14 +146,32 @@ const sketch = ({ context }) => {
       camera.updateProjectionMatrix();
     },
     // Update & render your scene here
-    render({ time }) {
-      // lines.forEach(line => {
-      //   const { vertices } = line.geometry;
+    render({ playhead }) {
+      const eased = Math.sin(playhead * Math.PI * 2);
 
-      //   vertices.forEach((vector, index) => {
-      //     vector.y += Math.sin(time) * 0.01;
-      //   });
-      // });
+      meshes.forEach(point => {
+        const noise = random.noise2D(
+          point.__original.u,
+          point.__original.v,
+          frequency,
+          amplitude
+        );
+        point.position.y = noise;
+      });
+
+      lines.forEach(({ geometry }, i) => {
+        geometry.vertices.forEach((vector, j) => {
+          const noise = random.noise2D(
+            vector.__original.x,
+            vector.__original.y,
+            frequency,
+            amplitude
+          );
+          const y = (vector.__original.y * eased) / amplitude;
+          vector.setY(y);
+        });
+        geometry.verticesNeedUpdate = true;
+      });
       controls.update();
       renderer.render(scene, camera);
     },

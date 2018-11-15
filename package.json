@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "make": "canvas-sketch --new --output=output --hot",
-    "serve": "canvas-sketch --output=output --hot"
+    "serve": "canvas-sketch --output=output --hot",
+    "serve-video": "canvas-sketch --output=tmp --hot"
   },
   "keywords": [],
   "author": "",
