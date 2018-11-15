@@ -39,7 +39,7 @@ const sketch = async ({ context, canvas }) => {
   // Setup your scene
   const scene = new THREE.Scene();
 
-  const image = await load('./assets/david.png');
+  const image = await load('./assets/titouan-large.png');
 
   const texture = new THREE.Texture(image);
   texture.wrapS = THREE.RepeatWrapping;
@@ -113,7 +113,7 @@ const sketch = async ({ context, canvas }) => {
     },
     // Update & render your scene here
     render({ time, width, height }) {
-      mesh.rotation.y = Math.sin(time * 0.5) * -0.5 + 2;
+      // mesh.rotation.y = Math.sin(time * 0.5) * -0.5 + 2;
       mesh.material.uniforms.time.value = time;
       mesh.material.uniforms.aspect.value = width / height;
       controls.update();
