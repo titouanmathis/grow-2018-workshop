@@ -1,4 +1,10 @@
-const canvasSketch = require('canvas-sketch');
+import canvasSketch from 'canvas-sketch';
+import random from 'canvas-sketch-util/random';
+
+/**
+ * Set the random's method seed
+ */
+random.setSeed(random.getRandomSeed());
 
 // Ensure ThreeJS is in global scope for the 'examples/'
 global.THREE = require('three');
@@ -7,6 +13,7 @@ global.THREE = require('three');
 require('three/examples/js/controls/OrbitControls');
 
 const settings = {
+  suffix: random.getSeed(),
   // Make the loop animated
   animate: true,
   // Get a WebGL canvas rather than 2D
@@ -39,11 +46,11 @@ const sketch = ({ context }) => {
   });
 
   // WebGL background color
-  renderer.setClearColor('#000', 1);
+  renderer.setClearColor('#fff', 1);
 
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(20, 20, -4);
+  camera.position.set(4, 4, 6);
   camera.lookAt(new THREE.Vector3());
 
   // Setup camera controller
@@ -53,35 +60,20 @@ const sketch = ({ context }) => {
   const scene = new THREE.Scene();
 
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshPhysicalMaterial({
-    color: '#fff',
-    roughness: 0.75,
-    flatShading: true,
-  });
-  const grid = createGrid();
-  const meshes = [];
+  const material = new THREE.MeshNormalMaterial();
 
-  grid.forEach(point => {
-    const [u, v, w] = point;
-    const x = u * 3;
-    const y = v * 3;
-    const z = w * 3;
+  for (let i = 0; i < 20; i++) {
     const mesh = new THREE.Mesh(geometry, material);
-    const position = new THREE.Vector3(x, y, z);
-    mesh.position.x = position.x;
-    mesh.position.y = position.y;
-    mesh.position.z = position.z;
-    meshes.push(mesh);
     scene.add(mesh);
-  });
-
-  // Specify an ambient/unlit colour
-  scene.add(new THREE.AmbientLight('#fff'));
-
-  // Add some light
-  const light = new THREE.PointLight('#fff', 1, 15.5);
-  light.position.set(2, 2, -4).multiplyScalar(1.5);
-  scene.add(light);
+    mesh.position
+      .set(random.range(-1, 1), random.range(-1, 1), random.range(-1, 1))
+      .multiplyScalar(1.2);
+    mesh.scale.set(
+      random.range(0.1, 1) * random.gaussian(),
+      random.range(0.1, 1) * random.gaussian(),
+      random.range(0.1, 1) * random.gaussian()
+    );
+  }
 
   // draw each frame
   return {
@@ -94,9 +86,6 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render({ time }) {
-      meshes.forEach(mesh => {
-        mesh.rotation.y = time * ((10 * Math.PI) / 90);
-      });
       controls.update();
       renderer.render(scene, camera);
     },
