@@ -6,6 +6,7 @@ const glsl = require('glslify');
 const settings = {
   context: 'webgl',
   animate: true,
+  dimensions: [512, 512],
 };
 
 const pointer = [];
@@ -25,6 +26,7 @@ const sketch = ({ gl }) => {
     gl,
     // Specify fragment and/or vertex shader strings
     frag,
+    clearColor: '#fff',
     // Specify additional uniforms to pass down to the shaders
     uniforms: {
       // Expose props from canvas-sketch

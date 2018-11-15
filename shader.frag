@@ -13,14 +13,14 @@ void main () {
 	d += 0.15 * noise(vec3(vUv * 1.5, time * 0.5));
 	d += 0.5 * noise(vec3(vUv * 0.51, time * 0.5));
 
-	vec2 coord = vUv - 0.5;
+	vec2 coord = vUv - pointer;
 	coord.x *= aspect;
 	float dist = length(coord);
-	float mask = dist > 0.25 ? 0.0 : 1.0;
+	float mask = smoothstep(0.25, 0.248, dist);
 
 	float hue = d * 0.25;
 	hue = mod(hue + time * 0.05, 1.0);
 
 	vec3 color = hsl2rgb(hue, 0.5, 0.5);
-  gl_FragColor = vec4(vec3(color * mask), 1.0);
+  gl_FragColor = vec4(vec3(color), mask);
 }
