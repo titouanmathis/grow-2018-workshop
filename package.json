@@ -5,7 +5,8 @@
   "main": "sketch.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "canvas-create": "canvas-sketch --new --output=output --hot"
+    "make": "canvas-sketch --new --output=output --hot",
+    "serve": "canvas-sketch --output=output --hot"
   },
   "keywords": [],
   "author": "",
