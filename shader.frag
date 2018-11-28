@@ -3,24 +3,27 @@ precision highp float;
 uniform float time;
 uniform float aspect;
 uniform vec2 pointer;
+uniform float maskSize;
 varying vec2 vUv;
+uniform sampler2D texture;
 
 #pragma glslify: noise = require('glsl-noise/simplex/3d');
-#pragma glslify: hsl2rgb = require('glsl-hsl2rgb');
 
 void main () {
-	float d = 0.0;
-	d += 0.15 * noise(vec3(vUv * 1.5, time * 0.5));
-	d += 0.5 * noise(vec3(vUv * 0.51, time * 0.5));
+	float d = 1.0;
 
-	vec2 coord = vUv - 0.5;
+	vec2 coord = vUv - 1.0 + pointer;
 	coord.x *= aspect;
 	float dist = length(coord);
-	float mask = smoothstep(0.25, 0.248, dist);
+	dist += 1.0 * noise(vec3(vUv * 1.5, time * 0.125));
+	dist += 0.9 * noise(vec3(vUv * 3.0, time * 0.25));
+	dist -= 0.01 * noise(vec3(vUv * 2000.0, time * 5.0));
+	dist -= 0.05 * noise(vec3(vUv * 1000.0, time * 2.0));
+	dist += 0.005 * noise(vec3(vUv * 100.0, time * 1.0));
+	dist += 0.05 * noise(vec3(vUv * 12.0, time * 1.0));
+	dist -= 0.09 * noise(vec3(vUv * 6.0, time * 0.5));
+	float mask = smoothstep(maskSize + 0.6, maskSize, dist);
 
-	float hue = d * 0.25;
-	hue = mod(hue + time * 0.05, 1.0);
-
-	vec3 color = hsl2rgb(hue, 0.5, 0.5);
-  gl_FragColor = vec4(vec3(color), mask);
+  vec4 texColor = texture2D(texture, vUv).rgba;
+  gl_FragColor = vec4(texColor.rgb, mask);
 }

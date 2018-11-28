@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "make": "canvas-sketch --new --output=output --hot",
     "serve": "canvas-sketch --output=output --hot",
-    "serve-video": "canvas-sketch --output=tmp --hot"
+    "serve-video": "canvas-sketch --output=tmp --hot",
+    "build-shader": "canvas-sketch shader.js --name index --build --inline --dir ."
   },
   "keywords": [],
   "author": "",
@@ -16,10 +17,13 @@
     "bezier-easing": "^2.1.0",
     "canvas-sketch": "0.0.27",
     "canvas-sketch-util": "^1.5.0",
+    "dat.gui": "^0.7.3",
     "eases": "^1.0.8",
     "gl-matrix": "^2.8.1",
+    "gl-texture2d": "^2.1.0",
     "glsl-hsl2rgb": "^1.1.0",
     "glsl-noise": "^0.0.0",
+    "gsap": "^2.0.2",
     "load-asset": "^1.2.0",
     "nice-color-palettes": "^2.0.0",
     "three": "^0.98.0"
