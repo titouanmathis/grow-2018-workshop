@@ -32,16 +32,18 @@ const sketch = async ({ gl, context }) => {
   const gui = new dat.GUI();
 
   const params = {
-    x: 0.5,
-    y: 0.5,
-    z: 0.5,
-    factor: 0.5,
     mask: 0.25,
+    innerScale: 0,
+    x: 0,
+    y: 0,
   };
 
-  Object.keys(params).forEach((key, index) => {
-    gui.add(params, key, -1, 2).step(0.01);
-  });
+  gui.add(params, 'mask', -1.75, 2.5).step(0.01);
+  gui.add(params, 'innerScale', 0, 1).step(0.01);
+  gui.add(params, 'x', 0, window.innerWidth).step(1);
+  gui.add(params, 'y', 0, window.innerHeight).step(1);
+
+  Object.keys(params).forEach((key, index) => {});
 
   // Create the shader and return it
   const shader = createShader({
@@ -57,9 +59,15 @@ const sketch = async ({ gl, context }) => {
       // Expose props from canvas-sketch
       texture: image,
       time: ({ time }) => time,
-      pointer: () => pointer,
+      pointer: () => {
+        const p = [0, 0];
+        p[0] = params.x / window.innerWidth;
+        p[1] = (window.innerHeight - params.y - 1) / window.innerHeight;
+        return p;
+      },
       aspect: ({ width, height }) => width / height,
       maskSize: () => params.mask,
+      innerScale: () => params.innerScale,
     },
   });
 
@@ -120,7 +128,7 @@ const sketch = async ({ gl, context }) => {
   head.appendChild(style);
 
   const text = document.createElement('h1');
-  text.innerHTML = 'Calendrier de l’avent';
+  text.innerHTML = '';
 
   document.body.appendChild(text);
 
@@ -138,4 +146,11 @@ const sketch = async ({ gl, context }) => {
   };
 };
 
-canvasSketch(sketch, settings);
+async function start() {
+  const cvs = await canvasSketch(sketch, settings);
+  return cvs;
+}
+
+start().then(cvs => {
+  console.log(cvs);
+});
