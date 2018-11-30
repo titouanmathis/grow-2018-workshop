@@ -114,6 +114,7 @@ const sketch = async ({ gl, context }) => {
       background-image: url(/assets/bg.jpg);
       background-size: 100% 100%;
       opacity: 0.1;
+      transform: scale(-1, 1);
     }
 
     canvas {
